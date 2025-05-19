@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <title>Estimer vos coûts de Transfert Wave</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f3f4f6;
+      padding: 20px;
+      max-width: 100%;
+      margin: 20px auto;
+    }
+    h1 {
+      color: #1f2937;
+      font-size: 22px;
+      text-align: center;
+    }
+    input, button, select {
+      padding: 10px;
+      margin: 10px 0;
+      width: 100%;
+      font-size: 16px;
+      border-radius: 25px;
+      border: 1px solid #d1d5db;
+    }
+    button {
+      background-color: #2563eb;
+      color: white;
+      border: none;
+      cursor: pointer;
+      outline: none;
+    }
+    button:hover {
+      background-color: #1d4ed8;
+    }
+    .result {
+      margin-top: 20px;
+      font-weight: bold;
+    }
+    .whatsapp-link {
+      display: block;
+      text-align: center;
+      margin-top: 30px;
+    }
+    .whatsapp-link button {
+      background-color: #075e54;
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      font-size: 16px;
+      border-radius: 25px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    .whatsapp-icon {
+      width: 20px;
+      height: 20px;
+    }
+  
+    @media (max-width: 600px) {
+      body {
+        padding: 10px;
+      }
+      h1 {
+        font-size: 18px;
+      }
+      input, button, select {
+        font-size: 14px;
+        padding: 8px;
+      }
+      .whatsapp-link button {
+        font-size: 14px;
+        padding: 10px 16px;
+      }
+    }
+    </style>
+    
+</head>
+<body>
+
+  <h1>Utilisez nos Services de transfert et économisez plus, Faites votre Estimation !</h1>
+
+  <label for="choix">Choisissez le type de conversion :</label>
+  <select id="choix" onchange="changerConversion()">
+    <option value="xofToCad">XOF → CAD</option>
+    <option value="cadToXof">CAD → XOF</option>
+  </select>
+
+  <div id="xofToCad">
+    <label for="xof">Montant en FCFA à Envoyer :</label>
+    <input type="number" id="xof" placeholder="Entrez le montant en FCFA" />
+    <button onclick="convertirXOFversCAD()">Convertir en CAD</button>
+  </div>
+
+  <div id="cadToXof" style="display:none;">
+    <label for="cad">Montant en CAD à Envoyer :</label>
+    <input type="number" id="cad" placeholder="Entrez le montant en CAD" />
+    <button onclick="convertirCADversXOF()">Convertir en XOF</button>
+  </div>
+
+  <div class="result" id="resultat"></div>
+
+  <div class="whatsapp-link">
+    <a href="https://wa.me/message/PSFDQDFKXJ25O1" target="_blank">
+      <button>
+        <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp" class="whatsapp-icon">
+        Contactez-Nous
+      </button>
+    </a>
+  </div>
+
+  <script>
+    const taux = 1 / 415;
+
+    function changerConversion() {
+      const choix = document.getElementById("choix").value;
+      document.getElementById("xofToCad").style.display = (choix === "xofToCad") ? "block" : "none";
+      document.getElementById("cadToXof").style.display = (choix === "cadToXof") ? "block" : "none";
+      document.getElementById("resultat").innerHTML = "";
+    }
+
+    function convertirXOFversCAD() {
+      const montantXOF = parseFloat(document.getElementById("xof").value);
+      const resultat = document.getElementById("resultat");
+
+      if (isNaN(montantXOF) || montantXOF <= 0) {
+        resultat.textContent = "Veuillez entrer un montant FCFA valide.";
+        return;
+      }
+
+      const montantCAD = montantXOF * taux;
+
+      if (montantCAD > 5000) {
+        resultat.textContent = "La limite maximale d'envoi est de 5000$ CAD par transaction.";
+        return;
+      }
+
+      const montantCADArrondi = Math.ceil(montantCAD);
+      const frais = Math.max(montantCAD * 0.01, 5);
+      const fraisArrondi = Math.ceil(frais);
+      const totalArrondi = Math.ceil(montantCAD + frais);
+
+      resultat.innerHTML = 
+        `Montant converti : ${montantCADArrondi} CAD<br>` +
+        `Frais de transfert : ${fraisArrondi} CAD<br>` +
+        `Total à payer : ${totalArrondi} CAD<br>` +
+        `Taux de change : 1 CAD = 415 XOF<br>` +
+        `<span style="color:red;">Il vous faut ${totalArrondi} CAD pour envoyer ${montantXOF} FCFA par Wave !</span>`;
+    }
+
+    function convertirCADversXOF() {
+      const montantCAD = parseFloat(document.getElementById("cad").value);
+      const resultat = document.getElementById("resultat");
+
+      if (isNaN(montantCAD) || montantCAD <= 0) {
+        resultat.textContent = "Veuillez entrer un montant CAD valide.";
+        return;
+      }
+
+      if (montantCAD > 5000) {
+        resultat.textContent = "La limite maximale d'envoi est de 5000$ CAD par transaction.";
+        return;
+      }
+
+      const montantXOF = montantCAD / taux;
+      const frais = Math.max(montantCAD * 0.01, 5);
+      const totalXOF = Math.floor((montantXOF - (frais / taux)) / 100) * 100;
+
+      resultat.innerHTML = 
+        `Montant converti : ${Math.floor(montantXOF)} FCFA<br>` +
+        `Frais estimés : ${Math.ceil(frais)} CAD<br>` +
+        `Montant net reçu (après frais) : ${Math.floor(totalXOF)} FCFA<br>` +
+        `Taux de change : 1 CAD = 415 XOF<br>` +
+        `<span style="color:red;">Pour ${montantCAD} CAD, vous pouvez envoyer ${Math.floor(totalXOF)} FCFA par Wave !</span>`;
+    }
+  </script>
+
+</body>
+</html>
