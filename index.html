@@ -103,7 +103,7 @@
 
   <div class="result" id="resultat"></div>
 
-  <div>
+  <div id="zoneDestinataire" style="display:none;">
     <br><br>
     <label for="prenomNomDestinataire">Prénom et nom du destinataire Wave :</label>
     <input type="text" id="prenomNomDestinataire" placeholder="Entrez le prénom et nom du destinataire Wave" />
@@ -113,7 +113,7 @@
     <input type="text" id="waveDestinataireConfirme" placeholder="Confirmez le numéro Wave du destinataire" />
   </div>
 
-  <div class="whatsapp-link">
+  <div class="whatsapp-link" style="display:none;" id="zoneWhatsApp">
     <button id="envoyerButton" onclick="envoyerVersWhatsApp()" disabled>
       <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp" class="whatsapp-icon">
       Envoyer
@@ -149,10 +149,12 @@
         return;
       } else {
         document.getElementById("envoyerButton").disabled = false;
+        document.getElementById("zoneDestinataire").style.display = 'block';
+        document.getElementById("zoneWhatsApp").style.display = 'block';
       }
 
       const montantCADArrondi = Math.ceil(montantCAD);
-      const frais = Math.max(montantCAD * 0.01, 5);
+      const frais = Math.max(montantCAD * 0.015, 5);
       const fraisArrondi = Math.ceil(frais);
       const totalArrondi = Math.ceil(montantCAD + frais);
 
@@ -179,6 +181,8 @@
         return;
       } else {
         document.getElementById("envoyerButton").disabled = false;
+        document.getElementById("zoneDestinataire").style.display = 'block';
+        document.getElementById("zoneWhatsApp").style.display = 'block';
       }
 
       const montantXOF = montantCAD / taux;
@@ -229,11 +233,9 @@ Numéro Wave : ${telDest}
 Estimation du transfert :
 ${montantConverti.replace(/<[^>]*>/g, '')}
 
-Estimation effectuée par KandjiTransfert.
-
 Refaire une Estimation en cliquant sur le lien suivant : https://kandji18.github.io/KandjiTransfert/
 
-© KandjiTransfert 2025`
+© KandjiTransfert 2025`;
 
       const url = `https://wa.me/?text=${encodeURIComponent(message)}`;
       window.open(url, '_blank');
