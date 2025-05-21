@@ -186,7 +186,7 @@
       }
 
       const montantXOF = montantCAD / taux;
-      const frais = Math.max(montantCAD * 0.01, 5);
+      const frais = Math.max(montantCAD * 0.015, 5);
       const totalXOF = Math.floor((montantXOF - (frais / taux)) / 100) * 100;
 
       resultat.innerHTML = 
