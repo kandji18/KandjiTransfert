@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -38,6 +39,7 @@
     .result {
       margin-top: 20px;
       font-weight: bold;
+      color: red;
     }
     .whatsapp-link {
       display: block;
@@ -61,7 +63,6 @@
       width: 20px;
       height: 20px;
     }
-  
     @media (max-width: 600px) {
       body {
         padding: 10px;
@@ -78,13 +79,10 @@
         padding: 10px 16px;
       }
     }
-    </style>
-    
+  </style>
 </head>
 <body>
-
   <h1>Utilisez nos Services de transfert et économisez plus, Faites votre Estimation !</h1>
-
   <label for="choix">Choisissez le type de conversion :</label>
   <select id="choix" onchange="changerConversion()">
     <option value="xofToCad">XOF → CAD</option>
@@ -94,28 +92,38 @@
   <div id="xofToCad">
     <label for="xof">Montant en FCFA à Envoyer :</label>
     <input type="number" id="xof" placeholder="Entrez le montant en FCFA" />
-    <button onclick="convertirXOFversCAD()">Convertir en CAD</button>
+    <button onclick="convertirXOFversCAD()">Estimer votre transfert</button>
   </div>
 
   <div id="cadToXof" style="display:none;">
     <label for="cad">Montant en CAD à Envoyer :</label>
     <input type="number" id="cad" placeholder="Entrez le montant en CAD" />
-    <button onclick="convertirCADversXOF()">Convertir en XOF</button>
+    <button onclick="convertirCADversXOF()">Estimer votre transfert</button>
   </div>
 
   <div class="result" id="resultat"></div>
 
+  <div>
+    <br><br>
+    <label for="prenomNomDestinataire">Prénom et nom du destinataire Wave :</label>
+    <input type="text" id="prenomNomDestinataire" placeholder="Entrez le prénom et nom du destinataire Wave" />
+    <label for="waveDestinataire">Numéro Wave du destinataire :</label>
+    <input type="text" id="waveDestinataire" placeholder="Entrez le numéro Wave du destinataire" />
+    <label for="waveDestinataireConfirme">Confirmer le numéro Wave du destinataire :</label>
+    <input type="text" id="waveDestinataireConfirme" placeholder="Confirmez le numéro Wave du destinataire" />
+  </div>
+
   <div class="whatsapp-link">
-    <a href="https://wa.me/message/PSFDQDFKXJ25O1" target="_blank">
-      <button>
-        <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp" class="whatsapp-icon">
-        Contactez-Nous
-      </button>
-    </a>
+    <button id="envoyerButton" onclick="envoyerVersWhatsApp()" disabled>
+      <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp" class="whatsapp-icon">
+      Envoyer
+    </button>
   </div>
 
   <script>
-    const taux = 1 / 415;
+    const TAUX_CHANGE = 415;
+    const taux = 1 / TAUX_CHANGE;
+    const maxLimitCAD = 5000;
 
     function changerConversion() {
       const choix = document.getElementById("choix").value;
@@ -135,13 +143,16 @@
 
       const montantCAD = montantXOF * taux;
 
-      if (montantCAD > 5000) {
+      if (montantCAD > maxLimitCAD) {
+        document.getElementById("envoyerButton").disabled = true;
         resultat.textContent = "La limite maximale d'envoi est de 5000$ CAD par transaction.";
         return;
+      } else {
+        document.getElementById("envoyerButton").disabled = false;
       }
 
       const montantCADArrondi = Math.ceil(montantCAD);
-      const frais = Math.max(montantCAD * 0.018, 5);
+      const frais = Math.max(montantCAD * 0.01, 5);
       const fraisArrondi = Math.ceil(frais);
       const totalArrondi = Math.ceil(montantCAD + frais);
 
@@ -149,8 +160,8 @@
         `Montant converti : ${montantCADArrondi} CAD<br>` +
         `Frais de transfert : ${fraisArrondi} CAD<br>` +
         `Total à payer : ${totalArrondi} CAD<br>` +
-        `Taux de change : 1 CAD = 415 XOF<br>` +
-        `<span style="color:red;">Il vous faut ${totalArrondi} CAD pour envoyer ${montantXOF} FCFA par Wave !</span>`;
+        `Taux de change : 1 CAD = ${TAUX_CHANGE} XOF<br>` +
+        `Il vous faut ${totalArrondi} CAD pour envoyer ${montantXOF} FCFA par Wave !`;
     }
 
     function convertirCADversXOF() {
@@ -162,9 +173,12 @@
         return;
       }
 
-      if (montantCAD > 5000) {
+      if (montantCAD > maxLimitCAD) {
+        document.getElementById("envoyerButton").disabled = true;
         resultat.textContent = "La limite maximale d'envoi est de 5000$ CAD par transaction.";
         return;
+      } else {
+        document.getElementById("envoyerButton").disabled = false;
       }
 
       const montantXOF = montantCAD / taux;
@@ -175,10 +189,55 @@
         `Montant converti : ${Math.floor(montantXOF)} FCFA<br>` +
         `Frais estimés : ${Math.ceil(frais)} CAD<br>` +
         `Montant net reçu (après frais) : ${Math.floor(totalXOF)} FCFA<br>` +
-        `Taux de change : 1 CAD = 415 XOF<br>` +
-        `<span style="color:red;">Pour ${montantCAD} CAD, vous pouvez envoyer ${Math.floor(totalXOF)} FCFA par Wave !</span>`;
+        `Taux de change : 1 CAD = ${TAUX_CHANGE} XOF<br>` +
+        `Pour ${montantCAD} CAD, vous pouvez envoyer ${Math.floor(totalXOF)} FCFA par Wave !`;
+    }
+
+    function envoyerVersWhatsApp() {
+      const nomDest = document.getElementById("prenomNomDestinataire").value.trim();
+      const telDest = document.getElementById("waveDestinataire").value.trim();
+      const telDestConfirme = document.getElementById("waveDestinataireConfirme").value.trim();
+
+      if (!nomDest || !telDest || !telDestConfirme) {
+        alert("Veuillez remplir toutes les informations avant de continuer.");
+        return;
+      }
+
+      const regexWave = /^[0-9]{9}$/;
+      if (!regexWave.test(telDest)) {
+        alert("Veuillez entrer un numéro Wave valide.");
+        return;
+      }
+
+      if (telDest !== telDestConfirme) {
+        alert("Les numéros Wave ne correspondent pas. Veuillez vérifier.");
+        return;
+      }
+
+      const montantConverti = document.getElementById("resultat").innerText;
+      if (!montantConverti) {
+        alert("Veuillez d'abord effectuer une estimation.");
+        return;
+      }
+
+      const message = 
+        `Nouvelle demande de transfert :
+
+Destinataire : ${nomDest}
+Numéro Wave : ${telDest}
+
+Estimation du transfert :
+${montantConverti.replace(/<[^>]*>/g, '')}
+
+Estimation effectuée par KandjiTransfert.
+
+Refaire une Estimation en cliquant sur le lien suivant : https://kandji18.github.io/KandjiTransfert/
+
+© KandjiTransfert 2025`
+
+      const url = `https://wa.me/?text=${encodeURIComponent(message)}`;
+      window.open(url, '_blank');
     }
   </script>
-
 </body>
 </html>
