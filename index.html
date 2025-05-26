@@ -63,6 +63,61 @@
       width: 20px;
       height: 20px;
     }
+
+    /* Toggle Switch */
+    .toggle-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .toggle-label {
+      font-weight: bold;
+      margin: 0 10px;
+      color: #1f2937;
+    }
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 60px;
+      height: 32px;
+    }
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #2563eb;
+      transition: .4s;
+      border-radius: 34px;
+    }
+    .slider:before {
+      position: absolute;
+      content: "⇄";
+      height: 26px;
+      width: 26px;
+      left: 4px;
+      bottom: 3px;
+      background-color: white;
+      color: #2563eb;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      transition: .4s;
+      font-size: 16px;
+    }
+    input:checked + .slider:before {
+      transform: translateX(26px);
+    }
+
     @media (max-width: 600px) {
       body {
         padding: 10px;
@@ -83,11 +138,14 @@
 </head>
 <body>
   <h1>Utilisez nos Services de transfert et économisez plus, Faites votre Estimation !</h1>
-  <label for="choix">Choisissez le type de conversion :</label>
-  <select id="choix" onchange="changerConversion()">
-    <option value="xofToCad">XOF → CAD</option>
-    <option value="cadToXof">CAD → XOF</option>
-  </select>
+
+  <div class="toggle-container">
+    <span class="toggle-label" id="conversionLabel">XOF → CAD</span>
+    <label class="switch">
+      <input type="checkbox" id="conversionToggle" onchange="basculerConversion()">
+      <span class="slider"></span>
+    </label>
+  </div>
 
   <div id="xofToCad">
     <label for="xof">Montant en FCFA à Envoyer :</label>
@@ -125,11 +183,26 @@
     const taux = 1 / TAUX_CHANGE;
     const maxLimitCAD = 5000;
 
-    function changerConversion() {
-      const choix = document.getElementById("choix").value;
-      document.getElementById("xofToCad").style.display = (choix === "xofToCad") ? "block" : "none";
-      document.getElementById("cadToXof").style.display = (choix === "cadToXof") ? "block" : "none";
-      document.getElementById("resultat").innerHTML = "";
+    function basculerConversion() {
+      const toggle = document.getElementById("conversionToggle");
+      const label = document.getElementById("conversionLabel");
+      const xofDiv = document.getElementById("xofToCad");
+      const cadDiv = document.getElementById("cadToXof");
+      const resultat = document.getElementById("resultat");
+
+      if (toggle.checked) {
+        label.textContent = "CAD → XOF";
+        xofDiv.style.display = "none";
+        cadDiv.style.display = "block";
+      } else {
+        label.textContent = "XOF → CAD";
+        xofDiv.style.display = "block";
+        cadDiv.style.display = "none";
+      }
+
+      resultat.innerHTML = "";
+      document.getElementById("zoneDestinataire").style.display = 'none';
+      document.getElementById("zoneWhatsApp").style.display = 'none';
     }
 
     function convertirXOFversCAD() {
